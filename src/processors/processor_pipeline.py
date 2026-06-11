@@ -1,5 +1,6 @@
 from typing import List
 from src.collectors.base import NewsItem
+from .models import ProcessedItem
 from .deduplicator import Deduplicator
 from .classifier import Classifier
 from .ranker import Ranker
@@ -13,7 +14,7 @@ class ProcessorPipeline:
         self.classifier = Classifier()
         self.ranker = Ranker()
 
-    def process(self, items: List[NewsItem]) -> List[dict]:
+    def process(self, items: List[NewsItem]) -> List[ProcessedItem]:
         """Process raw news items through the pipeline"""
         logger.info(f"Starting processing pipeline with {len(items)} items...")
 

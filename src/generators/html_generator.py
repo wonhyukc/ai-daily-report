@@ -1,6 +1,7 @@
 from typing import List
 from datetime import datetime, timezone
 from jinja2 import Environment, FileSystemLoader
+from src.processors.models import ProcessedItem
 from src.utils import logger
 from config.settings import TEMPLATES_DIR
 
@@ -10,7 +11,7 @@ class HTMLGenerator:
         self.env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
         self.env.autoescape = True
 
-    def generate(self, items: List[dict], trends: dict = None, report_date: datetime = None) -> str:
+    def generate(self, items: List[ProcessedItem], trends: dict = None, report_date: datetime = None) -> str:
         """Generate HTML report from processed items and trend analysis"""
         if report_date is None:
             report_date = datetime.now()
@@ -26,8 +27,7 @@ class HTMLGenerator:
             # Take top N items per category (safe sorting with None check)
             # published_at은 UTC aware — fallback도 aware로 맞춰 비교 오류 방지
             def get_published_date(x):
-                date = x.get('published_at')
-                return date if date else datetime.now(timezone.utc)
+                return x.published_at or datetime.now(timezone.utc)
 
             breaking_news = sorted(items[:10], key=get_published_date, reverse=True)
 
@@ -48,11 +48,11 @@ class HTMLGenerator:
             logger.error(f"Error generating HTML: {e}")
             raise
 
-    def _group_items(self, items: List[dict]) -> dict:
+    def _group_items(self, items: List[ProcessedItem]) -> dict:
         """Group items by category"""
         grouped = {}
         for item in items:
-            for category in item.get('categories', ['Other']):
+            for category in (item.categories or ['Other']):
                 if category not in grouped:
                     grouped[category] = []
                 grouped[category].append(item)
@@ -60,7 +60,7 @@ class HTMLGenerator:
         # Sort by importance within each category
         for category in grouped:
             grouped[category].sort(
-                key=lambda x: x.get('importance_score', 0),
+                key=lambda x: x.importance_score,
                 reverse=True
             )
 

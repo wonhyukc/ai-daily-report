@@ -13,9 +13,6 @@ class NewsItem(BaseModel):
     image_url: Optional[str] = None
     author: Optional[str] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-
     @field_validator("published_at")
     @classmethod
     def ensure_timezone_aware(cls, value: datetime) -> datetime:

@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 
 from src.generators.html_generator import HTMLGenerator
+from src.processors.models import ProcessedItem
 
 
 def make_processed_item(**overrides):
-    item = {
+    fields = {
         "title": "Sample article",
         "description": "description",
         "url": "https://example.com/a",
@@ -12,11 +13,9 @@ def make_processed_item(**overrides):
         "published_at": datetime(2026, 6, 10, tzinfo=timezone.utc),
         "categories": ["LLM"],
         "importance_score": 1.0,
-        "author": None,
-        "image_url": None,
     }
-    item.update(overrides)
-    return item
+    fields.update(overrides)
+    return ProcessedItem(**fields)
 
 
 SAMPLE_TRENDS = {

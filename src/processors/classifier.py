@@ -1,21 +1,21 @@
 from typing import List
 from src.collectors.base import NewsItem
+from src.processors.models import ProcessedItem
 from src.utils import logger, contains_word
 from config.settings import CATEGORIES
 
 
 class Classifier:
-    def classify_items(self, items: List[NewsItem]) -> List[dict]:
+    def classify_items(self, items: List[NewsItem]) -> List[ProcessedItem]:
         """Classify items into categories"""
         logger.info(f"Classifying {len(items)} items...")
         classified = []
 
         for item in items:
             categories = self._classify_text(item.title + " " + item.description)
-            classified.append({
-                **item.dict(),
-                "categories": categories
-            })
+            classified.append(
+                ProcessedItem(**item.model_dump(), categories=categories)
+            )
 
         logger.info(f"Classification complete")
         return classified
