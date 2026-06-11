@@ -122,6 +122,24 @@ git log --oneline tests/failing_test.py  # 최근 변경 확인
 
 ## 📋 프로젝트 스킬
 
+### project-enhancement-cycle
+코드베이스 감시 → 이슈 해결 → 문서 정리의 순환을 반복하여 프로젝트를 지속적으로 개선합니다.
+
+**자동 활성화:**
+```
+"프로젝트 개선 사이클"
+"지속적 개선 해줘"
+"완전 점검 후 정리"
+```
+
+**작동 방식:**
+1. audit-to-issues: 코드베이스 감시 → 이슈 발견
+2. issues-plan-and-resolve: 이슈 해결 (있을 때만)
+3. docs-audit: 문서 정리
+4. 반복: 새 이슈가 없을 때까지
+
+**자세히:** `.claude/skills/project-enhancement-cycle/README.md`
+
 ### docs-audit
 문서가 현재 상태만 정확히 표현하도록 점검하고 최적화합니다.
 
@@ -136,13 +154,6 @@ git log --oneline tests/failing_test.py  # 최근 변경 확인
 1. 현재 상태만 표현 (과거 제거)
 2. 문서 양 최소화 (중복 제거)
 3. 역할별 분리 (README ≠ CLAUDE ≠ 코드)
-
-**사용:**
-```bash
-"현황 문서화 점검해줘"
-# 또는
-/docs-audit
-```
 
 **자세히:** `.claude/skills/docs-audit/README.md`
 
