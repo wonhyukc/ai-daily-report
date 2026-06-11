@@ -109,28 +109,49 @@ DRY_RUN=true ./scripts/run.sh    # 드라이런 (파일 저장 안 함)
 
 ### 주요 설정 파일
 
-**`config/settings.py`**
+**`config/settings.py`** — 뉴스 소스, 처리 필터, 보고서 설정
+
 ```python
-# 뉴스 소스 활성화/비활성화
+# 뉴스 소스 설정 (활성화/비활성화 및 수집량 제어)
 NEWS_SOURCES = {
-    "hackernews": {"enabled": True, ...},
-    "arxiv": {"enabled": True, ...},
-    "rss_feeds": {"enabled": True, ...}
+    "hackernews": {
+        "enabled": True,
+        "max_stories": 30,        # 수집할 스토리 최대 개수
+        "base_url": "https://hacker-news.firebaseio.com/v0"
+    },
+    "arxiv": {
+        "enabled": True,
+        "categories": ["cs.AI", "cs.LG", "stat.ML"],  # 검색 카테고리
+        "max_results": 50,        # 카테고리별 최대 논문 수
+    },
+    "rss_feeds": {
+        "enabled": True,
+        "feeds": [...],           # RSS 피드 URL 목록
+        "max_items_per_feed": 10  # 피드당 최대 항목 수
+    }
 }
 
-# 보고서 생성 시간
+# 콘텐츠 처리 필터
+PROCESSING = {
+    "min_word_count": 10,        # 최소 단어 수 (RSS 요약 포함)
+    "cache_ttl_hours": 24,       # 중복 제거 캐시 보관 기간
+    "exclude_keywords": [...]    # 제외할 키워드
+}
+
+# 보고서 설정 (Phase 2 이메일 발송 시 사용)
 REPORT_SETTINGS = {
-    "timezone": "Asia/Seoul",
-    "time": "06:00"
+    "timezone": "Asia/Seoul",    # 시간대
+    "time": "06:00"              # 보고서 생성 시간
 }
 ```
 
 **`.env`**
 ```
-ANTHROPIC_API_KEY=your_key_here
-NEWSAPI_KEY=your_key_here (optional)
+ANTHROPIC_API_KEY=your_key_here  # Phase 2 이메일 요약 구현 시 필요
 LOG_LEVEL=INFO
 DRY_RUN=false
+REPORT_TIMEZONE=Asia/Seoul       # 보고서 표시 시간대
+REPORT_TIME=06:00               # 보고서 생성 시간
 ```
 
 ### RSS 피드 추가/변경

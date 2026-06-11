@@ -19,7 +19,7 @@ for d in [CACHE_DIR, LOGS_DIR, REPORTS_DIR]:
 
 # API Keys
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
+# NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")  # Phase 3 웹 스크래핑 예정
 
 # News Sources Configuration
 NEWS_SOURCES = {
@@ -58,16 +58,12 @@ LLM_CONFIG = {
     "timeout": 30,
 }
 
-# Report Settings
+# Report Settings (Phase 2 이메일 발송 구현 시 사용)
 REPORT_SETTINGS = {
     "timezone": os.getenv("REPORT_TIMEZONE", "Asia/Seoul"),
     "time": os.getenv("REPORT_TIME", "06:00"),
-    "include_sections": [
-        "breaking_news",
-        "trend_analysis",
-        "action_items",
-        "competitor_analysis"
-    ]
+    # 현재 Phase 1에서 구현된 섹션: breaking_news, trend_analysis, category_breakdown
+    # Phase 2 이후: action_items, competitor_analysis (LLM 기반 분석)
 }
 
 # Email Settings (for Phase 2)
