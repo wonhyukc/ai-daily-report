@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, field_validator
+from datetime import datetime, timezone
 
 
 class NewsItem(BaseModel):
@@ -15,6 +15,14 @@ class NewsItem(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+    @field_validator("published_at")
+    @classmethod
+    def ensure_timezone_aware(cls, value: datetime) -> datetime:
+        """naive datetime은 UTC로 간주 — 이후 단계는 aware를 전제로 동작"""
+        if value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
 
 
 class BaseCollector(ABC):

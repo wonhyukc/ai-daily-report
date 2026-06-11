@@ -1,6 +1,6 @@
 import feedparser
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 from .base import NewsItem, BaseCollector
 from src.utils import logger
@@ -22,12 +22,12 @@ class RSSCollector(BaseCollector):
 
                 for entry in feed.entries[:10]:  # Get top 10 from each feed
                     try:
-                        # Extract published date
-                        published_at = datetime.now()
+                        # Extract published date (feedparser의 *_parsed는 UTC 기준)
+                        published_at = datetime.now(timezone.utc)
                         if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                            published_at = datetime(*entry.published_parsed[:6])
+                            published_at = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
                         elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
-                            published_at = datetime(*entry.updated_parsed[:6])
+                            published_at = datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
 
                         item = NewsItem(
                             title=entry.get('title', ''),

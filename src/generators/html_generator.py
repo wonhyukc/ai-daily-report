@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 from jinja2 import Environment, FileSystemLoader
 from src.utils import logger
 from config.settings import TEMPLATES_DIR
@@ -24,9 +24,10 @@ class HTMLGenerator:
             items_by_category = self._group_items(items)
 
             # Take top N items per category (safe sorting with None check)
+            # published_at은 UTC aware — fallback도 aware로 맞춰 비교 오류 방지
             def get_published_date(x):
                 date = x.get('published_at')
-                return date if date else datetime.now()
+                return date if date else datetime.now(timezone.utc)
 
             breaking_news = sorted(items[:10], key=get_published_date, reverse=True)
 

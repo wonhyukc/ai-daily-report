@@ -48,13 +48,11 @@ class Ranker:
             score += 1.0
 
         # Recency (items published today get bonus)
+        # published_at은 NewsItem validator가 UTC aware를 보장
         published = item.get('published_at')
         if published:
             try:
                 now = datetime.now(timezone.utc)
-                # Handle both naive and aware datetimes
-                if published.tzinfo is None:
-                    published = published.replace(tzinfo=timezone.utc)
                 age_hours = (now - published).total_seconds() / 3600
                 if age_hours < 24:
                     score += self.recency_score * (1 - age_hours / 24)

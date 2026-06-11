@@ -1,5 +1,4 @@
 from typing import List
-from datetime import timezone
 from src.collectors.base import NewsItem
 from .deduplicator import Deduplicator
 from .classifier import Classifier
@@ -14,19 +13,11 @@ class ProcessorPipeline:
         self.classifier = Classifier()
         self.ranker = Ranker()
 
-    def _normalize_datetime(self, items: List[NewsItem]) -> List[NewsItem]:
-        """Normalize all datetimes to UTC"""
-        for item in items:
-            if item.published_at.tzinfo is None:
-                item.published_at = item.published_at.replace(tzinfo=timezone.utc)
-        return items
-
     def process(self, items: List[NewsItem]) -> List[dict]:
         """Process raw news items through the pipeline"""
         logger.info(f"Starting processing pipeline with {len(items)} items...")
 
-        # Step 0: Normalize datetimes
-        items = self._normalize_datetime(items)
+        # datetime 정규화는 NewsItem validator가 보장 (UTC aware)
 
         # Step 1: Deduplication
         logger.info("Step 1: Deduplication")
