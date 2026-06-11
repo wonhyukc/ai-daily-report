@@ -41,3 +41,7 @@ class ProcessorPipeline:
 
         logger.info(f"Processing complete. Final item count: {len(ranked_items)}")
         return ranked_items
+
+    def commit_cache(self):
+        """Dedup 캐시 영속화. 리포트 저장이 성공한 뒤에만 호출할 것."""
+        self.deduplicator.commit_cache()

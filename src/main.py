@@ -59,9 +59,11 @@ def main():
         if not DRY_RUN:
             file_storage = FileStorage()
             report_path = file_storage.save(html_content)
+            # 저장 성공 후에만 dedup 캐시 커밋 (실패/드라이런 시 기사 유실 방지)
+            processor.commit_cache()
             logger.info(f"\n✓ Report successfully generated: {report_path}")
         else:
-            logger.info("\n[DRY RUN] Would save report (DRY_RUN=true)")
+            logger.info("\n[DRY RUN] Would save report and commit dedup cache (DRY_RUN=true)")
 
         logger.info("=" * 60)
         logger.info(f"Pipeline completed successfully!")

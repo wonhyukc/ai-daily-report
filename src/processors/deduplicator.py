@@ -11,6 +11,7 @@ class Deduplicator:
     def __init__(self):
         self.cache_file = CACHE_DIR / "url_hashes.txt"
         self.cache = self._load_cache()
+        self._pending_hashes: Set[str] = set()
 
     def _load_cache(self) -> Set[str]:
         """Load previously seen URLs from cache"""
@@ -31,20 +32,30 @@ class Deduplicator:
         return hashlib.md5(normalized.encode()).hexdigest()
 
     def deduplicate(self, items: List[NewsItem]) -> List[NewsItem]:
-        """Remove duplicate items"""
+        """Remove duplicate items.
+
+        새로 본 해시는 pending에만 쌓이고, commit_cache()가 호출되기 전에는
+        영속되지 않는다. 파이프라인 후속 단계가 실패하거나 DRY_RUN이면
+        커밋하지 않음으로써 기사가 영구 유실되는 것을 방지한다.
+        """
         logger.info(f"Deduplicating {len(items)} items...")
         unique_items = []
-        new_hashes = []
 
         for item in items:
             url_hash = self._get_url_hash(item.url)
 
-            if url_hash not in self.cache:
+            if url_hash not in self.cache and url_hash not in self._pending_hashes:
                 unique_items.append(item)
-                new_hashes.append(url_hash)
-
-        self.cache.update(new_hashes)
-        self._save_cache()
+                self._pending_hashes.add(url_hash)
 
         logger.info(f"After deduplication: {len(unique_items)} unique items (removed {len(items) - len(unique_items)})")
         return unique_items
+
+    def commit_cache(self):
+        """Persist pending hashes. 리포트 저장이 성공한 뒤에만 호출할 것."""
+        if not self._pending_hashes:
+            return
+        self.cache.update(self._pending_hashes)
+        self._save_cache()
+        logger.info(f"Dedup cache committed ({len(self._pending_hashes)} new entries)")
+        self._pending_hashes = set()
