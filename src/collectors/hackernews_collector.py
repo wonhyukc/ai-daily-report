@@ -1,6 +1,7 @@
 import requests
 from typing import List
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from .base import NewsItem, BaseCollector
 from src.utils import logger, contains_word
 from config.settings import NEWS_SOURCES
@@ -25,18 +26,23 @@ class HackerNewsCollector(BaseCollector):
             response.raise_for_status()
             story_ids = response.json()[:self.max_stories]
 
-            # Collect story details
-            for story_id in story_ids:
+            # Collect story details in parallel
+            def fetch_story(story_id):
                 try:
                     story_url = f"{self.base_url}/item/{story_id}.json"
                     response = requests.get(story_url, timeout=self.timeout)
                     response.raise_for_status()
-                    story = response.json()
+                    return response.json()
+                except Exception as e:
+                    logger.debug(f"Error fetching story {story_id}: {e}")
+                    return None
 
-                    # Filter by keywords (AI-related)
-                    if self._is_ai_related(story.get("title", "")):
-                        # Ask HN 등 외부 링크 없는 글은 HN 퍼머링크로 대체
-                        # (빈 URL은 dedup 해시 충돌과 깨진 링크를 유발)
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                futures = {executor.submit(fetch_story, story_id): story_id for story_id in story_ids}
+                for future in as_completed(futures):
+                    story = future.result()
+                    if story and self._is_ai_related(story.get("title", "")):
+                        story_id = futures[future]
                         story_link = story.get("url") or f"https://news.ycombinator.com/item?id={story_id}"
                         item = NewsItem(
                             title=story.get("title", ""),
@@ -47,9 +53,6 @@ class HackerNewsCollector(BaseCollector):
                             author=story.get("by", None)
                         )
                         items.append(item)
-                except Exception as e:
-                    logger.debug(f"Error collecting story {story_id}: {e}")
-                    continue
 
             logger.info(f"Collected {len(items)} items from {self.source_name}")
             return items

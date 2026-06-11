@@ -246,7 +246,7 @@
             <div class="section">
                 <h2>🔥 속보 & 최신 뉴스</h2>
                 {% if breaking_news %}
-                    {% for item in breaking_news[:15] %}
+                    {% for item in breaking_news %}
                     <div class="news-item">
                         <div class="title">
                             <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
@@ -262,7 +262,7 @@
                             {% endif %}
                         </div>
                         {% if item.description %}
-                        <div class="description">{{ item.description[:300] }}...</div>
+                        <div class="description">{{ item.description | truncate(300, true) }}</div>
                         {% endif %}
                         <div class="categories">
                             {% for category in item.categories %}
