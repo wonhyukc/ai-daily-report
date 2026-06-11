@@ -3,6 +3,10 @@
     "docs-audit": {
       "enabled": true,
       "location": "./.claude/skills/docs-audit"
+    },
+    "project-enhancement-cycle": {
+      "enabled": true,
+      "location": "./.claude/skills/project-enhancement-cycle"
     }
   }
 }
