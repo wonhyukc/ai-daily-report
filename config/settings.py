@@ -50,11 +50,10 @@ PROCESSING = {
     "exclude_keywords": ["advertisement", "sponsored", "ad"],
 }
 
-# LLM Settings (Claude)
+# LLM Settings (Claude) — Phase 2 예정
 LLM_CONFIG = {
-    "model": "claude-3-5-sonnet-20241022",
+    "model": "claude-opus-4-8",
     "max_tokens": 500,
-    "temperature": 0.7,
     "timeout": 30,
 }
 
@@ -78,7 +77,12 @@ EMAIL_CONFIG = {
     "username": os.getenv("SMTP_USERNAME", ""),
     "password": os.getenv("SMTP_PASSWORD", ""),
     "from_address": os.getenv("SMTP_USERNAME", ""),
-    "to_addresses": os.getenv("EMAIL_RECIPIENTS", "").split(","),
+    # 빈 문자열일 때 [""]가 되지 않도록 공백 항목 제거
+    "to_addresses": [
+        addr.strip()
+        for addr in os.getenv("EMAIL_RECIPIENTS", "").split(",")
+        if addr.strip()
+    ],
     "subject_template": "📊 AI Daily Report - {date}"
 }
 
@@ -88,9 +92,8 @@ SLACK_CONFIG = {
     "webhook_url": os.getenv("SLACK_WEBHOOK_URL", ""),
 }
 
-# Logging
+# Logging (파일 경로는 src/utils/logger.py에서 관리)
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-LOG_FILE = LOGS_DIR / f"report-{{time}}.log"
 
 # Application
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"

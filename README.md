@@ -6,15 +6,17 @@ AI 뉴스와 트렌드를 자동으로 수집하여 매일 아침 전략담당�
 
 ### Phase 1 (현재)
 - ✅ 글로벌 AI 뉴스 자동 수집 (HackerNews, ArXiv, RSS)
-- ✅ 뉴스 중복 제거 및 필터링
-- ✅ 자동 카테고리 분류
+- ✅ 뉴스 중복 제거 (24시간 TTL 캐시) 및 콘텐츠 필터링
+- ✅ 자동 카테고리 분류 (단어 경계 키워드 매칭)
 - ✅ 중요도 순위 매김
+- ✅ 키워드 트렌드 분석 및 리포트 표시
 - ✅ 프로페셔널 HTML 리포트 생성
-- ✅ 매일 아침 06:00 AM 자동 실행
+- ✅ 매일 아침 06:00 AM 자동 실행 (Windows Task Scheduler)
+- ✅ pytest 단위 테스트
 
 ### Phase 2 (예정)
 - 🔄 Claude API를 이용한 LLM 기반 요약
-- 🔄 트렌드 분석 및 인사이트 생성
+- 🔄 LLM 기반 심층 트렌드 인사이트 생성
 - 🔄 액션 아이템 자동 추출
 - 🔄 이메일 발송 기능
 
@@ -28,37 +30,40 @@ AI 뉴스와 트렌드를 자동으로 수집하여 매일 아침 전략담당�
 
 ### 필수 요구사항
 - Python 3.11+
-- Windows 11 (또는 최신 Windows 10)
-- PowerShell 5.1+
+- macOS / Linux / Windows (자동 스케줄 실행은 Windows Task Scheduler 기준)
 
 ### 설치 및 설정
 
-1. **저장소 클론 또는 폴더 생성**
-```bash
-cd C:\temp\ai-daily-report
-```
+1. **저장소 클론 후 프로젝트 디렉토리로 이동**
 
 2. **초기 설정 실행**
+```bash
+# macOS / Linux
+python3 -m venv venv
+./venv/bin/pip install -r requirements.txt
+```
 ```powershell
+# Windows
 .\scripts\setup.ps1
 ```
 
-3. **API 키 설정**
-```powershell
+3. **API 키 설정** (Phase 2부터 필요)
+```bash
 # .env 파일 편집
-# 이 항목들을 작성하세요:
 # - ANTHROPIC_API_KEY (Anthropic Claude API)
-# - NEWSAPI_KEY (선택사항, Phase 2부터 필요)
+# - NEWSAPI_KEY (선택사항)
 ```
 
 4. **테스트 실행 (드라이런)**
+```bash
+DRY_RUN=true ./scripts/run.sh    # macOS / Linux
+```
 ```powershell
-.\scripts\run.ps1 -DryRun
+.\scripts\run.ps1 -DryRun        # Windows
 ```
 
-5. **스케줄 등록** (관리자 권한 필요)
+5. **스케줄 등록** (Windows 전용, 관리자 권한 필요)
 ```powershell
-# 관리자로 PowerShell 실행 후:
 .\scripts\install-task.ps1
 ```
 
@@ -66,27 +71,28 @@ cd C:\temp\ai-daily-report
 
 ### 수동 실행
 
+```bash
+# macOS / Linux
+./scripts/run.sh                 # 일반 실행
+DRY_RUN=true ./scripts/run.sh    # 드라이런 (파일 저장 안 함)
+```
 ```powershell
-# 일반 실행
+# Windows
 .\scripts\run.ps1
-
-# 테스트 실행 (파일 저장 안 함)
 .\scripts\run.ps1 -DryRun
-
-# 로그 저장
-.\scripts\run.ps1 -LogOutput "C:\temp\logs\report.log"
 ```
 
 ### 생성된 리포트
 
-- **위치**: `C:\temp\ai-daily-report\reports\`
+- **위치**: `reports/` (프로젝트 루트 기준)
 - **파일명**: `report-YYYY-MM-DD.html`
 - **최신**: `latest.html` (항상 최신 보고서)
 
-### 브라우저에서 보기
-```powershell
-# 최신 리포트 열기
-Start-Process "C:\temp\ai-daily-report\reports\latest.html"
+### 테스트 실행
+
+```bash
+./venv/bin/pip install -r requirements-dev.txt
+./venv/bin/pytest
 ```
 
 ## ⚙️ 설정
@@ -133,39 +139,51 @@ DRY_RUN=false
 ```
 뉴스 수집 (병렬)
   ↓
-데이터 처리 (중복 제거, 필터링, 분류)
+데이터 처리 (중복 제거 → 콘텐츠 필터링 → 분류 → 중요도 랭킹)
   ↓
-순위 매김 (중요도)
+트렌드 분석 (키워드/카테고리)
   ↓
-HTML 생성 (Jinja2 템플릿)
+HTML 생성 (Jinja2 템플릿, 트렌드 섹션 포함)
   ↓
-파일 저장
+파일 저장 (성공 시에만 중복 제거 캐시 커밋)
 ```
+
+### 수집량 (실행당)
+
+| 소스 | 건수 |
+|------|------|
+| HackerNews | 상위 30건 중 AI 관련 글만 |
+| ArXiv | 48건 (cs.AI / cs.LG / stat.ML 각 16건) |
+| RSS | 최대 30건 (피드 3개 × 10건) |
 
 ### 디렉토리 구조
 
 ```
-C:\temp\ai-daily-report\
+ai-daily-report/
 ├── src/
 │   ├── collectors/          # 뉴스 수집 모듈
-│   ├── processors/          # 데이터 처리
+│   ├── processors/          # 데이터 처리 (dedup, 필터, 분류, 랭킹)
 │   ├── analyzers/           # 분석 (트렌드 등)
 │   ├── generators/          # HTML 생성
 │   ├── delivery/            # 리포트 전달
+│   ├── utils/               # 로거, 텍스트 매칭 유틸
 │   └── main.py              # 진입점
 ├── config/
 │   └── settings.py          # 설정
 ├── templates/
 │   └── report.html          # HTML 템플릿
 ├── scripts/
-│   ├── run.ps1              # 실행 스크립트
-│   ├── install-task.ps1     # 스케줄 등록
-│   └── setup.ps1            # 초기 설정
+│   ├── run.sh               # 실행 스크립트 (macOS/Linux)
+│   ├── run.ps1              # 실행 스크립트 (Windows)
+│   ├── install-task.ps1     # 스케줄 등록 (Windows)
+│   └── setup.ps1            # 초기 설정 (Windows)
+├── tests/                   # pytest 단위 테스트
 ├── reports/                 # 생성된 리포트
 ├── data/
 │   ├── logs/                # 로그
-│   └── cache/               # 캐시 (중복 제거)
-└── requirements.txt         # Python 의존성
+│   └── cache/               # 캐시 (중복 제거, 24h TTL)
+├── requirements.txt         # Python 의존성
+└── requirements-dev.txt     # 개발/테스트 의존성
 ```
 
 ## 🔍 문제 해결
@@ -193,15 +211,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ### 뉴스가 수집되지 않음
-```powershell
-# 로그 확인
-Get-Content "C:\temp\ai-daily-report\data\logs\report-YYYY-MM-DD.log"
-
-# 인터넷 연결 확인
-Test-NetConnection -ComputerName hacker-news.firebaseio.com -Port 443
+```bash
+# 로그 확인 (프로젝트 루트 기준)
+cat data/logs/report-YYYY-MM-DD.log
 
 # 드라이런으로 테스트
-.\scripts\run.ps1 -DryRun
+DRY_RUN=true ./scripts/run.sh    # Windows: .\scripts\run.ps1 -DryRun
 ```
 
 ## 📈 성능 지표
@@ -217,13 +232,12 @@ Test-NetConnection -ComputerName hacker-news.firebaseio.com -Port 443
 ## 🔐 보안
 
 - API 키는 `.env` 파일에 저장 (Git 무시됨)
-- HTML 출력에 자동 XSS 방지 (Jinja2)
-- 민감 정보는 로그에서 마스킹
+- HTML 출력에 자동 XSS 방지 (Jinja2 autoescape)
 - HTTPS만 사용
 
 ## 📝 로깅
 
-로그 파일: `C:\temp\ai-daily-report\data\logs\report-YYYY-MM-DD.log`
+로그 파일: `data/logs/report-YYYY-MM-DD.log`
 
 로그 레벨 변경:
 ```python
@@ -263,9 +277,7 @@ COMPETITORS = [
 - 생성된 HTML 리포트의 통계 섹션
 
 ### 환경 정보
-```powershell
-# 시스템 정보 확인
-$PSVersionTable
+```bash
 python --version
 pip list
 ```
@@ -283,5 +295,5 @@ Internal Use Only
 
 ---
 
-**마지막 업데이트**: 2024년 6월
+**마지막 업데이트**: 2026년 6월
 **현재 버전**: 0.1.0 (Phase 1 MVP)
