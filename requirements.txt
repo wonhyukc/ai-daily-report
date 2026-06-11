@@ -1,30 +1,15 @@
 # Data Collection
 feedparser>=6.0.10
 requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=5.0.0
 arxiv>=2.0.0
-
-# Data Processing
-pandas>=2.0.0
-python-dateutil>=2.8.0
-langdetect>=1.0.9
-
-# LLM Integration
-anthropic>=0.25.0
 
 # HTML Generation
 Jinja2>=3.1.0
-markdown2>=2.4.0
 
 # Utilities
 python-dotenv>=1.0.0
 pydantic>=2.5.0
 loguru>=0.7.0
-pytz>=2024.1
 
-# Optional: Web scraping
-selenium>=4.15.0
-
-# Optional: Scheduling (for local APScheduler, if needed)
-APScheduler>=3.10.0
+# LLM Integration (Phase 2 예정 — 구현 시 주석 해제)
+# anthropic>=0.25.0
