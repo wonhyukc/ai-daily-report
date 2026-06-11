@@ -10,8 +10,8 @@ class HTMLGenerator:
         self.env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
         self.env.autoescape = True
 
-    def generate(self, items: List[dict], report_date: datetime = None) -> str:
-        """Generate HTML report from processed items"""
+    def generate(self, items: List[dict], trends: dict = None, report_date: datetime = None) -> str:
+        """Generate HTML report from processed items and trend analysis"""
         if report_date is None:
             report_date = datetime.now()
 
@@ -37,6 +37,7 @@ class HTMLGenerator:
                 'breaking_news': breaking_news,
                 'items_by_category': items_by_category,
                 'all_items': items,
+                'trends': trends,
             }
 
             html_content = template.render(**context)

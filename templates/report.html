@@ -139,6 +139,20 @@
             font-weight: 500;
         }
 
+        .trend-keywords {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .keyword-badge {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
         .importance {
             display: inline-block;
             color: #ff9800;
@@ -208,6 +222,26 @@
         </div>
 
         <div class="content">
+            {% if trends %}
+            <!-- Trend Analysis Section -->
+            <div class="section">
+                <h2>🔍 트렌드 분석</h2>
+                <div class="trend-keywords">
+                    {% for kw in trends.top_keywords[:20] %}
+                    <span class="keyword-badge">{{ kw.keyword }} <strong>{{ kw.count }}</strong></span>
+                    {% endfor %}
+                </div>
+                {% if trends.categories_distribution %}
+                <h3 style="color: #555; margin: 20px 0 10px;">카테고리 분포</h3>
+                <div class="categories">
+                    {% for category, count in trends.categories_distribution.items() %}
+                    <span class="category-badge">{{ category }}: {{ count }}개</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <!-- Breaking News Section -->
             <div class="section">
                 <h2>🔥 속보 & 최신 뉴스</h2>

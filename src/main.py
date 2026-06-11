@@ -52,7 +52,7 @@ def main():
         # Step 4: Generate HTML
         logger.info("\n[Step 4/5] Generating HTML report...")
         html_generator = HTMLGenerator()
-        html_content = html_generator.generate(processed_items)
+        html_content = html_generator.generate(processed_items, trends=trends)
 
         # Step 5: Save/Deliver
         logger.info("\n[Step 5/5] Saving report...")
