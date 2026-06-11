@@ -36,9 +36,8 @@ NEWS_SOURCES = {
     "rss_feeds": {
         "enabled": True,
         "feeds": [
-            "https://feeds.bloomberg.com/news/tech.rss",
             "https://feeds.arstechnica.com/arstechnica/index",
-            "https://feeds.techcrunch.com/techcrunch/",
+            "https://techcrunch.com/feed/",
         ]
     },
 }

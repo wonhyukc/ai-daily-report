@@ -20,6 +20,15 @@ class RSSCollector(BaseCollector):
                 logger.debug(f"Parsing feed: {feed_url}")
                 feed = feedparser.parse(feed_url)
 
+                # Issue #14: Check feed status and warn if dead
+                status = getattr(feed, 'status', 200)  # Default 200 for mock/test feeds
+                if status >= 400:
+                    logger.warning(f"Feed {feed_url} returned HTTP {status} (dead feed)")
+                    continue
+                if not feed.entries:
+                    logger.warning(f"Feed {feed_url} returned 0 entries (dead or invalid feed)")
+                    continue
+
                 for entry in feed.entries[:10]:  # Get top 10 from each feed
                     try:
                         # Issue #1: DateTime timezone handling (naive/aware mismatch)
