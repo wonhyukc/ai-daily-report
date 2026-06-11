@@ -12,10 +12,11 @@ class TrendDetector:
 
         # Extract all keywords from titles
         keywords = []
+        stopwords = {"The", "This", "That", "How", "Why", "What", "When", "Where", "And", "With", "For"}
         for item in items:
-            # Extract capitalized words as keywords
-            words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', item.title)
-            keywords.extend(words)
+            # Extract capitalized words (including acronyms like GPT, NVIDIA, OpenAI) as keywords
+            words = re.findall(r'\b[A-Z][A-Za-z0-9]*\b', item.title)
+            keywords.extend(w for w in words if w not in stopwords)
 
         # Count keyword frequency
         keyword_counts = Counter(keywords)
