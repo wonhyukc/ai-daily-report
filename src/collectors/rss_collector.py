@@ -4,12 +4,14 @@ from datetime import datetime, timezone
 import time
 from .base import NewsItem, BaseCollector
 from src.utils import logger
+from config.settings import NEWS_SOURCES
 
 
 class RSSCollector(BaseCollector):
     def __init__(self, feeds: List[str]):
         super().__init__("RSS")
         self.feeds = feeds
+        self.max_items_per_feed = NEWS_SOURCES.get("rss_feeds", {}).get("max_items_per_feed", 10)
 
     def collect(self) -> List[NewsItem]:
         logger.info(f"Collecting from {len(self.feeds)} RSS feeds...")
@@ -29,7 +31,7 @@ class RSSCollector(BaseCollector):
                     logger.warning(f"Feed {feed_url} returned 0 entries (dead or invalid feed)")
                     continue
 
-                for entry in feed.entries[:10]:  # Get top 10 from each feed
+                for entry in feed.entries[:self.max_items_per_feed]:
                     try:
                         # Issue #1: DateTime timezone handling (naive/aware mismatch)
                         # 모든 타임스탐프를 UTC aware로 통일하여 naive datetime과의 비교 오류 방지

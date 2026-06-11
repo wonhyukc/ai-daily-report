@@ -3,12 +3,15 @@ from typing import List
 from datetime import datetime, timezone
 from .base import NewsItem, BaseCollector
 from src.utils import logger, contains_word
+from config.settings import NEWS_SOURCES
 
 
 class HackerNewsCollector(BaseCollector):
     def __init__(self):
         super().__init__("HackerNews")
-        self.base_url = "https://hacker-news.firebaseio.com/v0"
+        hn_config = NEWS_SOURCES.get("hackernews", {})
+        self.base_url = hn_config.get("base_url", "https://hacker-news.firebaseio.com/v0")
+        self.max_stories = hn_config.get("max_stories", 30)
         self.timeout = 10
 
     def collect(self) -> List[NewsItem]:
@@ -20,7 +23,7 @@ class HackerNewsCollector(BaseCollector):
             top_stories_url = f"{self.base_url}/topstories.json"
             response = requests.get(top_stories_url, timeout=self.timeout)
             response.raise_for_status()
-            story_ids = response.json()[:30]  # Get top 30
+            story_ids = response.json()[:self.max_stories]
 
             # Collect story details
             for story_id in story_ids:

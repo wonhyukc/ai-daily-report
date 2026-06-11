@@ -3,13 +3,15 @@ from typing import List
 from datetime import datetime, timedelta, timezone
 from .base import NewsItem, BaseCollector
 from src.utils import logger
+from config.settings import NEWS_SOURCES
 
 
 class ArxivCollector(BaseCollector):
     def __init__(self):
         super().__init__("ArXiv")
-        self.categories = ["cs.AI", "cs.LG", "stat.ML"]
-        self.max_results = 50
+        arxiv_config = NEWS_SOURCES.get("arxiv", {})
+        self.categories = arxiv_config.get("categories", ["cs.AI", "cs.LG", "stat.ML"])
+        self.max_results = arxiv_config.get("max_results", 50)
 
     def collect(self) -> List[NewsItem]:
         logger.info(f"Collecting from {self.source_name}...")

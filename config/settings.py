@@ -38,7 +38,8 @@ NEWS_SOURCES = {
         "feeds": [
             "https://feeds.arstechnica.com/arstechnica/index",
             "https://techcrunch.com/feed/",
-        ]
+        ],
+        "max_items_per_feed": 10,  # RSS 피드별 최대 아이템 수
     },
 }
 
