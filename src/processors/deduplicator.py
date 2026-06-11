@@ -47,6 +47,8 @@ class Deduplicator:
 
     def _get_url_hash(self, url: str) -> str:
         """Generate hash of normalized URL"""
+        # Issue #5: URL 없는 HackerNews 글의 dedup 해시 충돌 해결
+        # URL을 정규화하여 http://example.com ≈ https://www.example.com 으로 취급
         normalized = url.lower().replace("https://", "").replace("http://", "").replace("www.", "")
         return hashlib.md5(normalized.encode()).hexdigest()
 
@@ -61,7 +63,8 @@ class Deduplicator:
         unique_items = []
 
         for item in items:
-            # 방어 로직: URL이 빈 항목은 제목+소스로 해시 (빈 문자열끼리 충돌 방지)
+            # Issue #5: HackerNews 항목 중 URL이 없는 경우 source:title로 대체 해싱
+            # 이렇게 하면 URL 없는 여러 항목이 같은 빈 문자열로 충돌하지 않음
             hash_source = item.url or f"{item.source}:{item.title}"
             url_hash = self._get_url_hash(hash_source)
 

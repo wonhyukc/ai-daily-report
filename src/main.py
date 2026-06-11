@@ -59,7 +59,10 @@ def main():
         if not DRY_RUN:
             file_storage = FileStorage()
             report_path = file_storage.save(html_content)
-            # 저장 성공 후에만 dedup 캐시 커밋 (실패/드라이런 시 기사 유실 방지)
+            # Issue #3: Dedup cache saved before pipeline success — DRY_RUN pollutes cache
+            # 저장 성공 후에만 dedup 캐시 커밋
+            # - DRY_RUN 실행 후에도 캐시가 유지되어야 함
+            # - 파이프라인 실패 시 이미 처리된 기사가 캐시에 영구 저장되면 안 됨
             processor.commit_cache()
             logger.info(f"\n✓ Report successfully generated: {report_path}")
         else:

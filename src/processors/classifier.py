@@ -22,6 +22,9 @@ class Classifier:
 
     def _classify_text(self, text: str) -> List[str]:
         """Classify text into categories based on keywords"""
+        # Issue #6: Substring keyword matching causes false positives
+        # contains_word()로 단어 경계 매칭 사용 (부분문자열 매칭 방지)
+        # 예: "anthropic" 검색 시 "misanthropic"에 매칭되지 않음
         matched_categories = []
 
         for category, keywords in CATEGORIES.items():

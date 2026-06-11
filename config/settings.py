@@ -43,11 +43,12 @@ NEWS_SOURCES = {
     },
 }
 
+# Issue #8: Implement unused PROCESSING settings (content filtering, cache TTL)
 # Processing Settings
 PROCESSING = {
-    "min_word_count": 50,        # 설명이 있는 항목의 최소 단어 수
-    "cache_ttl_hours": 24,       # dedup 캐시 보관 기간
-    "exclude_keywords": ["advertisement", "sponsored", "ad"],
+    "min_word_count": 50,        # 설명이 있는 항목의 최소 단어 수 (콘텐츠 필터링)
+    "cache_ttl_hours": 24,       # dedup 캐시 보관 기간 (24시간 TTL)
+    "exclude_keywords": ["advertisement", "sponsored", "ad"],  # 제외할 키워드
 }
 
 # LLM Settings (Claude) — Phase 2 예정

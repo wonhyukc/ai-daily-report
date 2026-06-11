@@ -32,6 +32,9 @@ class CollectorManager:
         logger.info("Starting news collection from all sources...")
         self._init_collectors()
 
+        # Issue #7: CollectorManager crashes when all news sources are disabled (max_workers=0)
+        # 모든 news source가 disabled일 때 ThreadPoolExecutor(max_workers=0)에서 ValueError 발생
+        # → 사전에 빈 리스트 반환하여 방지
         if not self.collectors:
             logger.warning("No news sources are enabled. Nothing to collect.")
             return []

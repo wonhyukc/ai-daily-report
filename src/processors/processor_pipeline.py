@@ -18,7 +18,8 @@ class ProcessorPipeline:
         """Process raw news items through the pipeline"""
         logger.info(f"Starting processing pipeline with {len(items)} items...")
 
-        # datetime 정규화는 NewsItem validator가 보장 (UTC aware)
+        # Issue #1: DateTime timezone handling - NewsItem validator가 UTC aware로 보장
+        # Issue #11: ProcessedItem 타입으로 파이프라인 전체 유지 (dict 변환 금지)
 
         # Step 1: Deduplication
         logger.info("Step 1: Deduplication")

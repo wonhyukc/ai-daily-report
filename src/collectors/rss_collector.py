@@ -22,7 +22,8 @@ class RSSCollector(BaseCollector):
 
                 for entry in feed.entries[:10]:  # Get top 10 from each feed
                     try:
-                        # Extract published date (feedparser의 *_parsed는 UTC 기준)
+                        # Issue #1: DateTime timezone handling (naive/aware mismatch)
+                        # 모든 타임스탐프를 UTC aware로 통일하여 naive datetime과의 비교 오류 방지
                         published_at = datetime.now(timezone.utc)
                         if hasattr(entry, 'published_parsed') and entry.published_parsed:
                             published_at = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)

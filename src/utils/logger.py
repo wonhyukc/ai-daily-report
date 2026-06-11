@@ -41,7 +41,9 @@ def _console_format(record) -> str:
 # Remove default handler
 logger.remove()
 
-# Create UTF-8 wrapper for stdout
+# Issue #2: Windows console encoding issue with emoji in logs
+# Windows 콘솔은 기본 cp949 인코딩으로 UTF-8 이모지를 출력할 수 없음
+# → stdout.buffer를 UTF-8로 래핑하여 해결
 utf8_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Add console handler (Windows에서는 이모지를 ASCII로 치환)

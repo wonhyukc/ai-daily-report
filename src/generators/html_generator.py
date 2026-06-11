@@ -13,6 +13,8 @@ class HTMLGenerator:
 
     def generate(self, items: List[ProcessedItem], trends: dict = None, report_date: datetime = None) -> str:
         """Generate HTML report from processed items and trend analysis"""
+        # Issue #4: Trend analysis computed but never included in the HTML report
+        # trends 파라미터로 트렌드 분석 결과를 HTML 템플릿에 포함
         if report_date is None:
             report_date = datetime.now()
 
