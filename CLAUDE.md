@@ -120,11 +120,40 @@ pytest tests/failing_test.py::test_name -vv
 git log --oneline tests/failing_test.py  # 최근 변경 확인
 ```
 
+## 📋 프로젝트 스킬
+
+### docs-audit
+문서가 현재 상태만 정확히 표현하도록 점검하고 최적화합니다.
+
+**자동 활성화:**
+```
+"현황 문서화 점검"
+"문서 상태 점검"
+"문서 최적화"
+```
+
+**3가지 원칙:**
+1. 현재 상태만 표현 (과거 제거)
+2. 문서 양 최소화 (중복 제거)
+3. 역할별 분리 (README ≠ CLAUDE ≠ 코드)
+
+**사용:**
+```bash
+"현황 문서화 점검해줘"
+# 또는
+/docs-audit
+```
+
+**자세히:** `.claude/skills/docs-audit/README.md`
+
+---
+
 ## 참고
 
 - **README.md** — 사용자 관점 (설치, 실행, 설정)
 - **`git log --oneline -20`** — 과거 결정의 맥락
 - **`git blame src/file.py`** — 특정 라인의 이유
+- **.claude/skills/docs-audit/** — 문서 감사 & 최적화 스킬
 
 ---
 
