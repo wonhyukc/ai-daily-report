@@ -32,6 +32,10 @@ class CollectorManager:
         logger.info("Starting news collection from all sources...")
         self._init_collectors()
 
+        if not self.collectors:
+            logger.warning("No news sources are enabled. Nothing to collect.")
+            return []
+
         all_items = []
 
         # Use ThreadPoolExecutor for parallel collection
