@@ -8,5 +8,6 @@ def contains_word(text: str, keyword: str) -> bool:
     키워드 앞뒤가 단어 문자가 아닐 때만 매칭한다. \\b 대신 lookaround를
     쓰는 이유는 "DALL-E"처럼 비단어 문자로 끝나는 키워드도 지원하기 위함.
     """
-    pattern = rf"(?<!\w){re.escape(keyword)}(?!\w)"
+    # 단순 복수형(GPUs, LLMs)은 매칭 유지
+    pattern = rf"(?<!\w){re.escape(keyword)}(?:s|es)?(?!\w)"
     return re.search(pattern, text, re.IGNORECASE) is not None

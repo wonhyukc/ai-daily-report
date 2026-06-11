@@ -65,6 +65,24 @@ class TestBonuses:
         assert ranker._calculate_score(make_ranked_dict(published_at=two_days_ago)) == 1.0
 
 
+class TestCompetitorWordBoundary:
+    """이슈 #6: 'Meta' ⊂ 'metadata' 같은 경쟁사 매칭 오탐 방지"""
+
+    def test_metadata_does_not_match_meta(self):
+        ranker = Ranker()
+        score = ranker._calculate_score(
+            make_ranked_dict(title="Improving metadata pipelines")
+        )
+        assert score == 1.0  # 경쟁사 보너스 없음
+
+    def test_meta_as_word_still_matches(self):
+        ranker = Ranker()
+        score = ranker._calculate_score(
+            make_ranked_dict(title="Meta announces new research lab")
+        )
+        assert score == 1.0 + ranker.competitor_score
+
+
 class TestRankItems:
     def test_items_sorted_by_score_descending(self):
         ranker = Ranker()

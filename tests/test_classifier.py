@@ -23,6 +23,18 @@ class TestClassifier:
         result = Classifier().classify_items(items)
         assert result[0]["categories"] == ["Other"]
 
+    def test_substring_does_not_trigger_category(self, make_item):
+        # 이슈 #6: "paper" ⊂ "Newspaper"가 Research로 분류되면 안 됨
+        items = [make_item(title="Newspaper industry digitization", description="")]
+        result = Classifier().classify_items(items)
+        assert result[0]["categories"] == ["Other"]
+
+    def test_plural_keyword_still_matches(self, make_item):
+        # "GPU" 키워드가 "GPUs"에도 매칭되어야 함
+        items = [make_item(title="New GPUs for datacenters", description="")]
+        result = Classifier().classify_items(items)
+        assert "Infrastructure" in result[0]["categories"]
+
     def test_original_fields_are_preserved(self, make_item):
         items = [make_item(title="ChatGPT update", url="https://example.com/x")]
         result = Classifier().classify_items(items)

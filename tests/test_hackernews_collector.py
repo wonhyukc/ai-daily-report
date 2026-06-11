@@ -25,6 +25,26 @@ def make_fake_get(stories):
     return fake_get
 
 
+class TestAiFilter:
+    """이슈 #6: 'ai' ⊂ 'said'/'paid' 같은 부분 문자열 오탐 방지"""
+
+    def test_substring_false_positives_rejected(self):
+        collector = HackerNewsCollector()
+        assert not collector._is_ai_related("He said the weather is nice")
+        assert not collector._is_ai_related("Paid family leave policy expands")
+        assert not collector._is_ai_related("Fresh air quality improves")
+
+    def test_real_ai_titles_accepted(self):
+        collector = HackerNewsCollector()
+        assert collector._is_ai_related("New AI chips announced")
+        assert collector._is_ai_related("Training neural networks efficiently")
+        assert collector._is_ai_related("Advances in machine learning")
+
+    def test_plural_keywords_accepted(self):
+        collector = HackerNewsCollector()
+        assert collector._is_ai_related("Comparing open-source LLMs")
+
+
 class TestUrllessStories:
     """이슈 #5: 외부 링크 없는 글(Ask HN 등)은 HN 퍼머링크를 가져야 함"""
 

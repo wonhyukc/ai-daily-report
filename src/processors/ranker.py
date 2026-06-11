@@ -1,6 +1,6 @@
 from typing import List
 from datetime import datetime, timezone
-from src.utils import logger
+from src.utils import logger, contains_word
 from config.settings import COMPETITORS
 
 
@@ -37,8 +37,8 @@ class Ranker:
         score *= self.source_weights.get(source, 1.0)
 
         # Competitor mention bonus
-        text = (item.get('title', '') + " " + item.get('description', '')).lower()
-        if any(comp.lower() in text for comp in COMPETITORS):
+        text = item.get('title', '') + " " + item.get('description', '')
+        if any(contains_word(text, comp) for comp in COMPETITORS):
             score += self.competitor_score
 
         # Category importance

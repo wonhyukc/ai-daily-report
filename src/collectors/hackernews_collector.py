@@ -2,7 +2,7 @@ import requests
 from typing import List
 from datetime import datetime, timezone
 from .base import NewsItem, BaseCollector
-from src.utils import logger
+from src.utils import logger, contains_word
 
 
 class HackerNewsCollector(BaseCollector):
@@ -57,4 +57,4 @@ class HackerNewsCollector(BaseCollector):
 
     def _is_ai_related(self, title: str) -> bool:
         keywords = ["AI", "machine learning", "neural", "LLM", "GPT", "model", "algorithm"]
-        return any(keyword.lower() in title.lower() for keyword in keywords)
+        return any(contains_word(title, keyword) for keyword in keywords)
