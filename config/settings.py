@@ -45,9 +45,8 @@ NEWS_SOURCES = {
 
 # Processing Settings
 PROCESSING = {
-    "min_word_count": 50,
-    "languages": ["en", "ko"],
-    "cache_ttl_hours": 24,
+    "min_word_count": 50,        # 설명이 있는 항목의 최소 단어 수
+    "cache_ttl_hours": 24,       # dedup 캐시 보관 기간
     "exclude_keywords": ["advertisement", "sponsored", "ad"],
 }
 

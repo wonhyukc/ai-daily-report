@@ -1,30 +1,49 @@
 import hashlib
-from typing import List, Set
+from typing import Dict, List, Set
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from src.collectors.base import NewsItem
 from src.utils import logger
-from config.settings import CACHE_DIR
+from config.settings import CACHE_DIR, PROCESSING
 
 
 class Deduplicator:
     def __init__(self):
         self.cache_file = CACHE_DIR / "url_hashes.txt"
+        self.ttl = timedelta(hours=PROCESSING.get("cache_ttl_hours", 24))
         self.cache = self._load_cache()
         self._pending_hashes: Set[str] = set()
 
-    def _load_cache(self) -> Set[str]:
-        """Load previously seen URLs from cache"""
-        if self.cache_file.exists():
-            with open(self.cache_file, 'r', encoding='utf-8') as f:
-                return set(line.strip() for line in f if line.strip())
-        return set()
+    def _load_cache(self) -> Dict[str, datetime]:
+        """Load previously seen URL hashes, dropping entries older than TTL.
+
+        포맷: "{hash}\t{ISO timestamp}" — 타임스탬프 없는 레거시 줄은
+        현재 시각으로 간주해 유지한다 (오래된 기사 일괄 재노출 방지).
+        """
+        if not self.cache_file.exists():
+            return {}
+
+        now = datetime.now(timezone.utc)
+        entries: Dict[str, datetime] = {}
+        with open(self.cache_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                hash_val, _, ts_raw = line.partition("\t")
+                try:
+                    seen_at = datetime.fromisoformat(ts_raw) if ts_raw else now
+                except ValueError:
+                    seen_at = now
+                if now - seen_at <= self.ttl:
+                    entries[hash_val] = seen_at
+        return entries
 
     def _save_cache(self):
         """Save cache to file"""
         with open(self.cache_file, 'w', encoding='utf-8') as f:
-            for hash_val in self.cache:
-                f.write(f"{hash_val}\n")
+            for hash_val, seen_at in self.cache.items():
+                f.write(f"{hash_val}\t{seen_at.isoformat()}\n")
 
     def _get_url_hash(self, url: str) -> str:
         """Generate hash of normalized URL"""
@@ -55,7 +74,9 @@ class Deduplicator:
         """Persist pending hashes. 리포트 저장이 성공한 뒤에만 호출할 것."""
         if not self._pending_hashes:
             return
-        self.cache.update(self._pending_hashes)
+        now = datetime.now(timezone.utc)
+        for hash_val in self._pending_hashes:
+            self.cache[hash_val] = now
         self._save_cache()
         logger.info(f"Dedup cache committed ({len(self._pending_hashes)} new entries)")
         self._pending_hashes = set()

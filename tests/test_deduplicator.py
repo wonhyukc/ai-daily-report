@@ -58,6 +58,47 @@ class TestDeduplicate:
         assert len(cache_file.read_text(encoding="utf-8").strip().splitlines()) == 1
 
 
+class TestCacheTtl:
+    """이슈 #8: cache_ttl_hours를 넘긴 캐시 항목은 만료되어야 함"""
+
+    def test_expired_entries_are_dropped_on_load(self, cache_dir, make_item):
+        from datetime import datetime, timedelta, timezone
+
+        old_ts = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
+        d = Deduplicator()
+        url_hash = d._get_url_hash("https://example.com/old")
+        (cache_dir / "url_hashes.txt").write_text(
+            f"{url_hash}\t{old_ts}\n", encoding="utf-8"
+        )
+
+        fresh = Deduplicator()
+        result = fresh.deduplicate([make_item(url="https://example.com/old")])
+        assert len(result) == 1  # 만료된 항목은 다시 수집 허용
+
+    def test_fresh_entries_are_kept_on_load(self, cache_dir, make_item):
+        from datetime import datetime, timezone
+
+        now_ts = datetime.now(timezone.utc).isoformat()
+        d = Deduplicator()
+        url_hash = d._get_url_hash("https://example.com/new")
+        (cache_dir / "url_hashes.txt").write_text(
+            f"{url_hash}\t{now_ts}\n", encoding="utf-8"
+        )
+
+        fresh = Deduplicator()
+        result = fresh.deduplicate([make_item(url="https://example.com/new")])
+        assert result == []
+
+    def test_legacy_lines_without_timestamp_are_kept(self, cache_dir, make_item):
+        d = Deduplicator()
+        url_hash = d._get_url_hash("https://example.com/legacy")
+        (cache_dir / "url_hashes.txt").write_text(f"{url_hash}\n", encoding="utf-8")
+
+        fresh = Deduplicator()
+        result = fresh.deduplicate([make_item(url="https://example.com/legacy")])
+        assert result == []
+
+
 class TestCacheCommitTiming:
     """이슈 #3: 파이프라인 성공 전(커밋 전)에는 캐시가 영속되면 안 됨"""
 
