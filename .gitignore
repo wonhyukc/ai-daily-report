@@ -58,3 +58,6 @@ Thumbs.db
 
 # Project specific
 config/api_keys.json
+
+# Claude local reports
+.claude/health-reports/
