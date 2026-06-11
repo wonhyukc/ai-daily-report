@@ -61,7 +61,9 @@ class Deduplicator:
         unique_items = []
 
         for item in items:
-            url_hash = self._get_url_hash(item.url)
+            # 방어 로직: URL이 빈 항목은 제목+소스로 해시 (빈 문자열끼리 충돌 방지)
+            hash_source = item.url or f"{item.source}:{item.title}"
+            url_hash = self._get_url_hash(hash_source)
 
             if url_hash not in self.cache and url_hash not in self._pending_hashes:
                 unique_items.append(item)

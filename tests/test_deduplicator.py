@@ -58,6 +58,20 @@ class TestDeduplicate:
         assert len(cache_file.read_text(encoding="utf-8").strip().splitlines()) == 1
 
 
+class TestEmptyUrls:
+    """이슈 #5 방어 로직: URL이 비어도 항목끼리 충돌하면 안 됨"""
+
+    def test_empty_url_items_do_not_collide(self, cache_dir, make_item):
+        d = Deduplicator()
+        result = d.deduplicate(
+            [
+                make_item(url="", title="First urlless item"),
+                make_item(url="", title="Second urlless item"),
+            ]
+        )
+        assert len(result) == 2
+
+
 class TestCacheTtl:
     """이슈 #8: cache_ttl_hours를 넘긴 캐시 항목은 만료되어야 함"""
 

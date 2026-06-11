@@ -32,10 +32,13 @@ class HackerNewsCollector(BaseCollector):
 
                     # Filter by keywords (AI-related)
                     if self._is_ai_related(story.get("title", "")):
+                        # Ask HN 등 외부 링크 없는 글은 HN 퍼머링크로 대체
+                        # (빈 URL은 dedup 해시 충돌과 깨진 링크를 유발)
+                        story_link = story.get("url") or f"https://news.ycombinator.com/item?id={story_id}"
                         item = NewsItem(
                             title=story.get("title", ""),
                             description=story.get("text", ""),
-                            url=story.get("url", ""),
+                            url=story_link,
                             source=self.source_name,
                             published_at=datetime.fromtimestamp(story.get("time", 0), tz=timezone.utc),
                             author=story.get("by", None)
