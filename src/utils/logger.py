@@ -54,12 +54,15 @@ logger.add(
 )
 
 # Add file handler (UTF-8 파일은 이모지 유지)
-log_file = LOGS_DIR / "report-{time:YYYY-MM-DD}.log"
-logger.add(
-    log_file,
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
-    level=LOG_LEVEL,
-    rotation="daily"
-)
+# pytest 환경에서는 등록하지 않는다 — 테스트 로그가 운영 일일 로그를 오염시켜
+# pipeline-debugger의 진단 근거(단계별 count 라인)를 흐리기 때문 (#20)
+if "pytest" not in sys.modules:
+    log_file = LOGS_DIR / "report-{time:YYYY-MM-DD}.log"
+    logger.add(
+        log_file,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
+        level=LOG_LEVEL,
+        rotation="daily"
+    )
 
 __all__ = ["logger"]
