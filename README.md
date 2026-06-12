@@ -61,7 +61,7 @@ python3 -m venv venv
 ```bash
 # .env 파일 편집
 # - ANTHROPIC_API_KEY (Anthropic Claude API)
-# - NEWSAPI_KEY (선택사항)
+# - NEWSAPI_KEY (Phase 3 웹 스크래핑용, 선택사항)
 ```
 
 4. **테스트 실행 (드라이런)**
@@ -122,7 +122,7 @@ NEWS_SOURCES = {
     "arxiv": {
         "enabled": True,
         "categories": ["cs.AI", "cs.LG", "stat.ML"],  # 검색 카테고리
-        "max_results": 50,        # 카테고리별 최대 논문 수
+        "max_results": 50,        # 전체 최대 논문 수 (카테고리별 균등 분배)
     },
     "rss_feeds": {
         "enabled": True,
@@ -185,7 +185,7 @@ HTML 생성 (Jinja2 템플릿, 트렌드 섹션 포함)
 |------|------|
 | HackerNews | 상위 30건 중 AI 관련 글만 |
 | ArXiv | 48건 (cs.AI / cs.LG / stat.ML 각 16건) |
-| RSS | 최대 30건 (피드 3개 × 10건) |
+| RSS | 최대 20건 (피드 2개 × 10건) |
 
 ### 디렉토리 구조
 
@@ -326,5 +326,4 @@ Internal Use Only
 
 ---
 
-**마지막 업데이트**: 2026년 6월
 **현재 버전**: 0.1.0 (Phase 1 MVP)
