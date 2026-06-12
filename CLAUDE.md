@@ -13,7 +13,7 @@
 
 - **타입 안정성**: NewsItem → ProcessedItem → HTML (dict 변환 금지)
 - **설정 중심**: PROCESSING, NEWS_SOURCES로 동작을 제어 (하드코딩 금지)
-- **테스트 우선**: 60개 테스트 유지, 새 기능은 테스트부터
+- **테스트 우선**: 전체 테스트 그린 유지, 새 기능은 테스트부터
 
 ## 개발 규칙
 
@@ -44,7 +44,7 @@ class ProcessedItem(NewsItem):
 
 2. **Green**: 타입 정의 → 구현 → 통과 확인
    ```bash
-   pytest  # 전체 60개 통과해야 함
+   pytest  # 전체 통과해야 함
    ```
 
 3. **Refactor**: 정리 후 PR
@@ -63,12 +63,12 @@ PROCESSING["min_word_count"] = 100  # 필터링 강도 조정
 ### 테스트 전략
 
 ```bash
-pytest                          # 전체 (60개)
+pytest                          # 전체
 pytest tests/test_processor*.py # 특정 모듈
 pytest -k "dedup"              # 키워드 필터
 ```
 
-**규칙**: 기능 추가 시 테스트도 추가, 60개 유지.
+**규칙**: 기능 추가 시 테스트도 추가, 전체 그린 유지. (현재 개수는 README 현황표가 단일 기준)
 
 ## 주요 파일
 
@@ -77,7 +77,7 @@ pytest -k "dedup"              # 키워드 필터
 | `config/settings.py` | 모든 설정 중심 |
 | `src/processors/models.py` | ProcessedItem 타입 정의 |
 | `src/main.py` | 파이프라인 실행 (5단계) |
-| `tests/` | 60개 pytest 케이스 |
+| `tests/` | pytest 케이스 (개수는 README 현황표 참조) |
 
 ## Phase 2 체크리스트
 
@@ -87,7 +87,7 @@ Phase 2 (LLM 기반 요약, 트렌드, 액션 아이템, 이메일):
 - [ ] 새 파일 생성 (예: `src/processors/summarizer.py`)
 - [ ] ProcessedItem 타입 확장 (새 필드 추가)
 - [ ] 테스트 10개 이상 추가
-- [ ] `pytest` 실행 → 60개 + N개 모두 통과
+- [ ] `pytest` 실행 → 기존 + 신규 모두 통과
 - [ ] README 업데이트 (Phase 2 기능 ✅ 체크)
 - [ ] 커밋 & PR
 

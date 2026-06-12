@@ -37,7 +37,7 @@ argument-hint: [source-name]
 
 5. **검증**:
    ```bash
-   ./venv/bin/pytest                      # 기존 60개 + 신규 모두 통과
+   ./venv/bin/pytest                      # 기존 + 신규 모두 통과
    DRY_RUN=true ./scripts/run.sh          # 실제 수집 드라이런
    ```
 
