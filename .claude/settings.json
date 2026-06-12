@@ -1,4 +1,22 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | grep -qE '(src|tests)/.*\\.py$' && ./venv/bin/pytest -q --tb=line 2>&1 | tail -3 || true",
+            "timeout": 60,
+            "statusMessage": "pytest 회귀 검사 중..."
+          }
+        ]
+      }
+    ]
+  },
   "skills": {
     "docs-audit": {
       "enabled": true,

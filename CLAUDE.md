@@ -120,42 +120,42 @@ pytest tests/failing_test.py::test_name -vv
 git log --oneline tests/failing_test.py  # 최근 변경 확인
 ```
 
-## 📋 프로젝트 스킬
+## 🛠 하네스 구성 (.claude/)
 
-### project-enhancement-cycle
-코드베이스 감시 → 이슈 해결 → 문서 정리의 순환을 반복하여 프로젝트를 지속적으로 개선합니다.
+역할 구분: **에이전트 = 누가**(전문가 + 도구 제한), **스킬 = 어떻게**(절차), **훅 = 언제**(자동화).
 
-**자동 활성화:**
-```
-"프로젝트 개선 사이클"
-"지속적 개선 해줘"
-"완전 점검 후 정리"
-```
+### 서브에이전트 (.claude/agents/)
 
-**작동 방식:**
-1. audit-to-issues: 코드베이스 감시 → 이슈 발견
-2. issues-plan-and-resolve: 이슈 해결 (있을 때만)
-3. docs-audit: 문서 정리
-4. 반복: 새 이슈가 없을 때까지
+| 에이전트 | 역할 | 도구 제한 |
+|---------|------|----------|
+| `pipeline-debugger` | 파이프라인 장애 진단 (수집 0건, 필터 전멸, dead feed, 캐시 오염). 코드 수정 없이 근본 원인 보고 | 읽기 전용 + Bash |
+| `tdd-test-writer` | RED 단계 전담 — 버그 재현 테스트·신규 테스트 작성. tests/만 수정 | src/ 수정 금지 |
 
-**자세히:** `.claude/skills/project-enhancement-cycle/README.md`
+### 스킬 (.claude/skills/)
 
-### docs-audit
-문서가 현재 상태만 정확히 표현하도록 점검하고 최적화합니다.
+**유지보수 워크플로우** (순환: project-enhancement-cycle이 아래 셋을 오케스트레이션)
 
-**자동 활성화:**
-```
-"현황 문서화 점검"
-"문서 상태 점검"
-"문서 최적화"
-```
+| 스킬 | 트리거 |
+|------|--------|
+| `project-enhancement-cycle` | "프로젝트 개선 사이클", "지속적 개선" — 감시→해결→문서 정리 반복 |
+| `audit-to-issues` | 점검 후 근본 원인별로 GitHub 이슈 등록 |
+| `issues-plan-and-resolve` | 열린 이슈 일괄 계획·해결 |
+| `docs-audit` | 문서가 현재 상태만 표현하도록 정리 (히스토리는 git에 위임) |
 
-**3가지 원칙:**
-1. 현재 상태만 표현 (과거 제거)
-2. 문서 양 최소화 (중복 제거)
-3. 역할별 분리 (README ≠ CLAUDE ≠ 코드)
+**개발 워크플로우**
 
-**자세히:** `.claude/skills/docs-audit/README.md`
+| 스킬 | 용도 |
+|------|------|
+| `/run-pipeline [--dry]` | 파이프라인 실행 + 단계별 count 검증 (수동 호출 전용 — 캐시 커밋 부수효과) |
+| `add-news-source` | 새 수집기 추가 절차 (설정→테스트→구현→등록→문서 동기화) |
+
+### 훅 (.claude/settings.json)
+
+- **PostToolUse(Edit|Write)**: src/·tests/의 .py 수정 시 전체 pytest 자동 실행 (스위트 0.2초) — 회귀 즉시 감지
+
+### 에이전트 팀
+
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성화됨. 독립적인 이슈 다건 병렬 처리 시 사용. 같은 파일을 수정하는 작업은 팀원에게 동시 배정 금지.
 
 ---
 
