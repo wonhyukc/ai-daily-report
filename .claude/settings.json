@@ -25,6 +25,10 @@
     "project-enhancement-cycle": {
       "enabled": true,
       "location": "./.claude/skills/project-enhancement-cycle"
+    },
+    "quality-rubric": {
+      "enabled": true,
+      "location": "./.claude/skills/quality-rubric"
     }
   }
 }

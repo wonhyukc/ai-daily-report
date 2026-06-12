@@ -130,15 +130,17 @@ git log --oneline tests/failing_test.py  # 최근 변경 확인
 |---------|------|----------|
 | `pipeline-debugger` | 파이프라인 장애 진단 (수집 0건, 필터 전멸, dead feed, 캐시 오염). 코드 수정 없이 근본 원인 보고 | 읽기 전용 + Bash |
 | `tdd-test-writer` | RED 단계 전담 — 버그 재현 테스트·신규 테스트 작성. tests/만 수정 | src/ 수정 금지 |
+| `quality-scorer` | 품질 루브릭의 정성 차원 1개를 앵커 기준으로 채점 (증거 인용 의무). quality-rubric 스킬이 차원별 병렬 디스패치 | 읽기 전용 + Bash |
 
 ### 스킬 (.claude/skills/)
 
-**유지보수 워크플로우** (순환: project-enhancement-cycle이 아래 셋을 오케스트레이션)
+**유지보수 워크플로우** (순환: project-enhancement-cycle이 아래 넷을 오케스트레이션)
 
 | 스킬 | 트리거 |
 |------|--------|
-| `project-enhancement-cycle` | "프로젝트 개선 사이클", "지속적 개선" — 감시→해결→문서 정리 반복 |
-| `audit-to-issues` | 점검 후 근본 원인별로 GitHub 이슈 등록 |
+| `project-enhancement-cycle` | "프로젝트 개선 사이클", "지속적 개선" — 측정→감시→해결→문서 정리 반복 |
+| `quality-rubric` | "품질 평가", "루브릭 채점" — 정량 60(명령어 측정) + 정성 40(앵커 채점). 기준은 `.claude/skills/quality-rubric/RUBRIC.md` |
+| `audit-to-issues` | 점검 후 근본 원인별로 GitHub 이슈 등록 (루브릭 감점 항목을 출발점으로) |
 | `issues-plan-and-resolve` | 열린 이슈 일괄 계획·해결 |
 | `docs-audit` | 문서가 현재 상태만 표현하도록 정리 (히스토리는 git에 위임) |
 
